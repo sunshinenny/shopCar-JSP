@@ -16,13 +16,6 @@
   + 在线投票系统
   + Ajax聊天室
 
-- Web前端
-  + ~~Dom相关操作~~
-  + ~~jQuery~~
-  + ~~jQuery UI~~
-  + ~~Easy UI~~
-  + ~~Bootstrap~~
-
 
 # 开发时遇到的问题，bug或者待完善的地方
 #开发
@@ -56,3 +49,5 @@ while (getSingle.next()) {
 ## Java
 - Unknown initial character set index '255' received from server. Initial client character set can be forced via the 'characterEncoding' property.
 	- 解决方法：**将过时的JDBC驱动更新到了最新版**
+
+  
