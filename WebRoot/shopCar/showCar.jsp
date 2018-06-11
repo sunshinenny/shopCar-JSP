@@ -55,9 +55,9 @@
 			<i id="end"></i> <span><a href="doCar?action=shopBox&id=-1">商城库存</a></span>
 			<i id="end"></i> <span>总价:<%=df.format(total)%></span> <i id="end"></i>
 			<br>
-			<span><a href="doCar?action=docar&id=-1">购买</a></span>
+			<span><a href="doCar?action=docar&id=-1"><span style="color:red;">购买</span></a></span>
 			<br>
-			<span><a href="doCar?action=clear&id=-1">清除购物车</a></span>
+			<span><a href="doCar?action=clear&id=-1"><span style="color: #FFFFFF;">清除购物车</span></a></span>
 		</div>
 	</div>
 	<div id="msg">移除成功！</div>

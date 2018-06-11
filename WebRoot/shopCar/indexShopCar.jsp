@@ -79,7 +79,7 @@
 				String imgUrl = single.getName() + ".jpg";
 	%>
 	<div class="col-sm-6 col-md-4" style="width: 20%;" align="center">
-		<div class="thumbnail">
+		<div class="thumbnail col-sm-12">
 			<img src="img/<%=imgUrl%>" width="180" height="180">
 			<h4>
 				<span>￥<%=single.getPrice()%></span> <span><font
