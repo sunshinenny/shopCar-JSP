@@ -12,7 +12,7 @@
 <body>
 	<jsp:include page="top.jsp"></jsp:include>
 	<div class="col-md-8">
-		<form action="checkUserInfoServers" method="post" role="form"
+		<form action="checkUserInfoServers?act=zc" method="post" role="form"
 			style="width: 600px;">
 			<c:if test="${dlerror==null }" var="error1" scope="session">
 				<div class="form-group">
