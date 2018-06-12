@@ -26,11 +26,13 @@ public class shopCarOptionDao {
 	 * @param name
 	 * @param price
 	 * @param num
+	 * @param username
 	 * @return
 	 * @throws NamingException
 	 * @throws SQLException
 	 */
-	public static boolean add(String strId, String name, float price, int num) throws SQLException, NamingException {
+	public static boolean add(String strId, String name, float price, int num, String username)
+			throws SQLException, NamingException {
 		// 新建连接
 		Connection conn = JDBCUnit.conn();
 		Statement stm = conn.createStatement();
@@ -48,32 +50,48 @@ public class shopCarOptionDao {
 			if (length == 0) {
 				// 将商品压入数据库
 				PreparedStatement pStmt = conn
-						.prepareStatement("insert into shopCar (id,name,price,num) value(?,?,?,?)");
+						.prepareStatement("insert into shopCar (id,name,price,num,username) value(?,?,?,?,?)");
 				pStmt.setString(1, strId);
 				pStmt.setString(2, name);
 				pStmt.setLong(3, (long) price);
 				pStmt.setLong(4, num);
+				pStmt.setString(5, username);
 				pStmt.executeUpdate();
 				JDBCUnit.close(null, null, conn);
 				return true;
 			} else {
 				// 否则将其数量加1
 				while (getSingle.next()) {
-					// 遍历ReaultSet对象
-					// 获取已知的商品数量
-					int singleNum = getSingle.getInt("num") + 1;
-					/**
-					 * 直接写在循环中是因为相信同样的商品在数据库中只会出现一次
-					 * 但也有问题：如果这个数据库存在“编号不相同，但是名字相同的商品时，此处就会出现修改数量错误的bug”
-					 */
-					Statement wantAddOneSingleStatement = conn.createStatement();
-					// sql语句-查找shopCar中商品名「name」等于传递而来的name的商品，并将其数量更新为singleNum「此时的singleNum的数量已经加一了」
-					wantAddOneSingleStatement
-							.executeUpdate("UPDATE shopCar SET num=" + singleNum + " where name='" + name + "' ");
-					// 关闭数据库
-					JDBCUnit.close(getSingle, stm, conn);
-					return true;
+					// 对购买的用户进行判断，进而修改单个用户的购买内容
+					if (getSingle.getString("username").equals(username)) {
+						// 遍历ReaultSet对象
+						// 获取已知的商品数量
+						int singleNum = getSingle.getInt("num") + 1;
+						/**
+						 * 直接写在循环中是因为相信同样的商品在数据库中只会出现一次
+						 * 但也有问题：如果这个数据库存在“编号不相同，但是名字相同的商品时，此处就会出现修改数量错误的bug”
+						 */
+						Statement wantAddOneSingleStatement = conn.createStatement();
+						// sql语句-查找shopCar中商品名「name」等于传递而来的name的商品，并将其数量更新为singleNum「此时的singleNum的数量已经加一了」
+						wantAddOneSingleStatement.executeUpdate("UPDATE shopCar SET num=" + singleNum + " where name='"
+								+ name + "' and username='" + username + "' ");
+						// 关闭数据库
+						conn.close();
+						return true;
+					}
+
 				}
+				// 遍历结束后如果没有return回去，说明没有该用户，则针对该用户增加指定商品
+				PreparedStatement pStmt = conn
+						.prepareStatement("insert into shopCar (id,name,price,num,username) value(?,?,?,?,?)");
+				pStmt.setString(1, strId);
+				pStmt.setString(2, name);
+				pStmt.setLong(3, (long) price);
+				pStmt.setLong(4, num);
+				pStmt.setString(5, username);
+				pStmt.executeUpdate();
+				conn.close();
+				return true;
 
 			}
 
@@ -83,7 +101,6 @@ public class shopCarOptionDao {
 			JDBCUnit.close(null, null, conn);
 			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -158,16 +175,20 @@ public class shopCarOptionDao {
 
 	/**
 	 * 将数据库中的内容存入GoodsList格式的集合中，用以shopCar.jsp进行显示
+	 * @param username 
 	 * 
 	 * @return
 	 * @throws SQLException
 	 * @throws NamingException
 	 */
-	public static ArrayList<GoodsList> show() throws SQLException, NamingException {
+	public static ArrayList<GoodsList> show(String username) throws SQLException, NamingException {
+		if(username==null){
+			username="noLogin";
+		}
 		ArrayList<GoodsList> list = new ArrayList<GoodsList>();
 		Connection conn = JDBCUnit.conn();
 		Statement stm = conn.createStatement();
-		ResultSet rs = stm.executeQuery("select * from shopCar");
+		ResultSet rs = stm.executeQuery("select * from shopCar where username='"+username+"'");
 		while (rs.next()) {
 			String gName = rs.getString("name");
 			float gPrice = rs.getFloat("price");

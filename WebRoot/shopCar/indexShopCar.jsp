@@ -3,6 +3,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%
 	ArrayList<GoodsList> goodSingle = new getGoodsInfoDao().goodsInfo();
@@ -31,7 +32,7 @@
 		}
 		return httpReq;
 	}
-	function addGoodsToShopCar(i) {
+	function addGoodsToShopCar(i, username) {
 
 		//初始化XmlHttpRequest对象
 		var httpReq = createXmlHttpRequest();
@@ -54,7 +55,9 @@
 		}
 		var id = i;
 		console.log("the goodsId is " + id);
-		var url = "doCar?action=buy&id=" + id;
+		// 此处URL多传递了一个参数，可能导致别的调用docar的地方出现问题，警告⚠
+		console.log(username);
+		var url = "doCar?action=buy&id=" + id + "&username=" + username;
 		//建立对服务器的调用,第三个变量缺省值为true-同步传输，false-异步传输
 		httpReq.open("POST", url, true);
 		//状态改变的事件触发器,客户端的状态改变会触发readystatechange事件，调用相应的事件处理函数
@@ -87,7 +90,16 @@
 			</h4>
 
 			<p><%=single.getName()%></p>
-			<a class="button orange addcar" onclick="addGoodsToShopCar(<%=i%>)">加入购物车</a>
+			<c:if test="${loginUserName!=null }" var="userNameFlag"
+				scope="session">
+				<a class="button orange addcar"
+					onclick="addGoodsToShopCar(<%=i%>,'<%=session.getAttribute("loginUserName") %>')">加入购物车</a>
+			</c:if>
+			<c:if test="${loginUserName==null }" var="userNameFlag"
+				scope="session">
+				<a class="button orange addcar"
+					onclick="addGoodsToShopCar(<%=i%>,'noLogin')">加入购物车</a>
+			</c:if>
 		</div>
 	</div>
 	<%

@@ -45,6 +45,8 @@ public class checkUserInfoServers extends HttpServlet {
 				if (userInfoDao.check(formUsername, formPassword)) {
 					// 如果返回值为true，即验证通过
 					// 设置显示内容-登陆成功
+					// 将登陆成功的用户名压入到session中，变量名为LoginUserName
+					request.getSession().setAttribute("loginUserName", formUsername);
 					request.getSession().setAttribute("dlerror", null);
 					// 重定向
 					response.sendRedirect("index.jsp");

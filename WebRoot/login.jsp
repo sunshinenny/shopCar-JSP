@@ -38,11 +38,18 @@
 			</c:if>
 			<div>
 				<td><input type="submit" value="登陆"
-					class="btn btn-embossed btn-primary" /></td>
+					class="btn btn-embossed btn-primary" id="loginButton" /></td>
 				<td><input type="reset" value="取消" style="background: gray;"
 					class="btn btn-default btn-primary" /></td>
 			</div>
 		</form>
 	</div>
+	<c:if test="${act eq 'loginThanBuy'} " var="result" scope="page">
+		<script type="text/javascript">
+			alert('test');
+			var changeButton = document.getElementById("loginButton");
+			changeButton.innerHTML = "登陆后即可购买";
+		</script>
+	</c:if>
 </body>
 </html>

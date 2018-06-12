@@ -17,12 +17,13 @@ public class shopCarOptionServers {
 	 * @param name
 	 * @param price
 	 * @param num
+	 * @param username 
 	 * @throws NamingException
 	 * @throws SQLException
 	 */
-	public static boolean add(String strId, String name, float price, int num) throws SQLException, NamingException {
+	public static boolean add(String strId, String name, float price, int num, String username) throws SQLException, NamingException {
 
-		return shopCarOptionDao.add(strId, name, price, num);
+		return shopCarOptionDao.add(strId, name, price, num,username);
 
 	}
 
@@ -53,8 +54,8 @@ public class shopCarOptionServers {
 	 * @throws SQLException
 	 * @throws NamingException
 	 */
-	public static ArrayList<GoodsList> showCar() throws SQLException, NamingException {
-		return shopCarOptionDao.show();
+	public static ArrayList<GoodsList> showCar(String username) throws SQLException, NamingException {
+		return shopCarOptionDao.show(username);
 	}
 
 	/**
