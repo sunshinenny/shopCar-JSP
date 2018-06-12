@@ -42,14 +42,21 @@ public class checkUserInfoServers extends HttpServlet {
 			String formPassword = request.getParameter("password");
 			// 链接数据库，进行信息匹对
 			try {
+				// 如果返回值为true，即验证通过
+				// 设置显示内容-登陆成功
 				if (userInfoDao.check(formUsername, formPassword)) {
-					// 如果返回值为true，即验证通过
-					// 设置显示内容-登陆成功
-					// 将登陆成功的用户名压入到session中，变量名为LoginUserName
-					request.getSession().setAttribute("loginUserName", formUsername);
-					request.getSession().setAttribute("dlerror", null);
-					// 重定向
-					response.sendRedirect("index.jsp");
+					// 将购物车中所有者为noLogin的商品修改成登陆后的ß用户
+					// 需要解决的问题，如果该用户已存在对应商品，需要提取购物车中的商品数量与其相加
+					if (shopCarOptionServers.changeUser(formUsername)) {
+						// 将登陆成功的用户名压入到session中，变量名为LoginUserName
+						request.getSession().setAttribute("loginUserName", formUsername);
+						request.getSession().setAttribute("dlerror", null);
+						// 重定向
+						response.sendRedirect("index.jsp");
+					} else {
+						System.out.println("修改数据失败，请重试");
+					}
+					
 				} else {
 					// 登陆错误
 					request.getSession().setAttribute("dlerror", "nameError");

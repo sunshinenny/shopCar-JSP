@@ -16,7 +16,7 @@
 <body>
 	<%!float total = 0;%>
 	<%
-		DecimalFormat df = new DecimalFormat("0.00");
+		DecimalFormat df = new DecimalFormat("0.0");
 		if (buyList == null || buyList.size() == 0) {
 			total = 0;
 	%>
@@ -54,7 +54,7 @@
 	<div class="m-sidebar">
 		<div class="cart">
 			<i id="end"></i> <span><a href="doCar?action=shopBox&id=-1">商城库存</a></span>
-			<i id="end"></i> <span>总价:<%=df.format(total)%></span> <i id="end"></i>
+			<i id="end"></i> <span>总价<br><%=df.format(total)%></span> <i id="end"></i>
 			<br>
 			<c:if test="${loginUserName!=null}" var="cheackLoginResult" scope="session">
 					<span><a href="doCar?action=docar&id=-1"><span style="color:red;">购买</span></a></span>

@@ -17,13 +17,14 @@ public class shopCarOptionServers {
 	 * @param name
 	 * @param price
 	 * @param num
-	 * @param username 
+	 * @param username
 	 * @throws NamingException
 	 * @throws SQLException
 	 */
-	public static boolean add(String strId, String name, float price, int num, String username) throws SQLException, NamingException {
+	public static boolean add(String strId, String name, float price, int num, String username)
+			throws SQLException, NamingException {
 
-		return shopCarOptionDao.add(strId, name, price, num,username);
+		return shopCarOptionDao.add(strId, name, price, num, username);
 
 	}
 
@@ -41,8 +42,8 @@ public class shopCarOptionServers {
 	 * 
 	 * @param name
 	 * @return
-	 * @throws SQLException 
-	 * @throws NamingException 
+	 * @throws SQLException
+	 * @throws NamingException
 	 */
 	public static boolean remove(String name) throws NamingException, SQLException {
 		return shopCarOptionDao.remove(name);
@@ -62,13 +63,27 @@ public class shopCarOptionServers {
 	 * 对比购物车表和库存表 减少库存中的数量
 	 * 
 	 * @return
-	 * @throws NamingException 
-	 * @throws SQLException 
+	 * @throws NamingException
+	 * @throws SQLException
 	 */
 
 	public static boolean buy() throws SQLException, NamingException {
 		System.out.println("function is in servers");
 		// TODO Auto-generated method stub
 		return shopCarOptionDao.buy();
+	}
+
+	/**
+	 * 将购物车中所有者为noLogin的商品修改成登陆后的用户 需要解决的问题，如果该用户已存在对应商品，需要提取购物车中的商品数量与其相加
+	 * 
+	 * @param formUsername
+	 * @return 
+	 * @throws NamingException 
+	 * @throws SQLException 
+	 */
+	public static boolean changeUser(String formUsername) throws SQLException, NamingException {
+		System.out.println("in servers");
+		return shopCarOptionDao.changeUser(formUsername);
+
 	}
 }

@@ -175,20 +175,21 @@ public class shopCarOptionDao {
 
 	/**
 	 * 将数据库中的内容存入GoodsList格式的集合中，用以shopCar.jsp进行显示
-	 * @param username 
+	 * 
+	 * @param username
 	 * 
 	 * @return
 	 * @throws SQLException
 	 * @throws NamingException
 	 */
 	public static ArrayList<GoodsList> show(String username) throws SQLException, NamingException {
-		if(username==null){
-			username="noLogin";
+		if (username == null) {
+			username = "noLogin";
 		}
 		ArrayList<GoodsList> list = new ArrayList<GoodsList>();
 		Connection conn = JDBCUnit.conn();
 		Statement stm = conn.createStatement();
-		ResultSet rs = stm.executeQuery("select * from shopCar where username='"+username+"'");
+		ResultSet rs = stm.executeQuery("select * from shopCar where username='" + username + "'");
 		while (rs.next()) {
 			String gName = rs.getString("name");
 			float gPrice = rs.getFloat("price");
@@ -213,7 +214,6 @@ public class shopCarOptionDao {
 	 * @throws NamingException
 	 */
 	public static boolean buy() throws SQLException, NamingException {
-		System.out.println("function is in dao.buy");
 		// 连接数据库
 		Connection conn = JDBCUnit.conn();
 		// 获取库存信息
@@ -222,11 +222,9 @@ public class shopCarOptionDao {
 		// 获取购物车信息
 		Statement stmShopCar = conn.createStatement();
 		ResultSet rsShopCar = stmShopCar.executeQuery("select * from shopCar");
-		System.out.println("before next");
 		// 库存信息作为外循环开始遍历
 		try {
 			while (rsAll.next()) {
-				System.out.println("in next");
 				String outName = rsAll.getString("name");
 				int outNum = rsAll.getInt("num");
 				while (rsShopCar.next()) {
@@ -235,8 +233,6 @@ public class shopCarOptionDao {
 					int inNum = rsShopCar.getInt("num");
 					if (outName.equals(inName)) {
 						int cut = outNum - inNum;
-						System.out.println("the same name is" + outName + "\nand the num is" + outNum + "\ninNum is"
-								+ inNum + "\nand the cut num is " + cut);
 						if (changeKuCun(outName, cut)) {
 							continue;
 						} else {
@@ -266,13 +262,87 @@ public class shopCarOptionDao {
 	 * @throws NamingException
 	 */
 	private static boolean changeKuCun(String outName, int i) throws SQLException, NamingException {
-		System.out.println("function is in dao.changeKuCun");
 		Connection conn = JDBCUnit.conn();
 		try {
 			Statement stm = conn.createStatement();
 			stm.executeUpdate("UPDATE goods SET num=" + i + " where name='" + outName + "' ");
 			// 调用上方定义的清空购物车方法
 			clear();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+		return false;
+	}
+
+	/**
+	 * 将购物车中所有者为noLogin的商品修改成登陆后的用户 需要解决的问题，如果该用户已存在对应商品，需要提取购物车中的商品数量与其相加
+	 * 
+	 * @param formUsername
+	 * @return
+	 * @throws NamingException
+	 * @throws SQLException
+	 */
+	public static boolean changeUser(String formUsername) throws SQLException, NamingException {
+		Connection conn = JDBCUnit.conn();
+		System.out.println("in dao.changeUser");
+		try {
+			// 获取未登陆时的项目
+			Statement originUser = conn.createStatement();
+			// 获取登陆后的项目
+			Statement loginUser = conn.createStatement();
+			ResultSet originResultSet = originUser.executeQuery("select * from shopCar where username='noLogin'");
+			ResultSet loginResultSet = loginUser
+					.executeQuery("select * from shopCar where username='" + formUsername + "'");
+			System.out.println("before try");
+			try {
+				while (originResultSet.next()) {
+					System.out.println("in outNext");
+					String originName = originResultSet.getString("name");
+					int originNum = originResultSet.getInt("num");
+					while (loginResultSet.next()) {
+						String loginName = loginResultSet.getString("name");
+						int loginNum = loginResultSet.getInt("num");
+						if (originName.equals(loginName)) {
+							int add = originNum + loginNum;
+							if (changeUserName(originName, add,formUsername)) {
+								System.out.println("in changeUserName");
+								continue;
+							} else {
+								System.out.println("购买操作失败，请重试");
+							}
+						}
+					}
+					loginResultSet.beforeFirst();
+				}
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				// 关闭数据库
+				conn.close();
+			}
+			// UPDATE goods SET num=" + i + " where name='" + outName + "' "
+			// 调用上方定义的清空购物车方法
+			clear();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+		return false;
+	}
+
+	private static boolean changeUserName(String originName, int add, String formUsername) throws SQLException, NamingException {
+		Connection conn = JDBCUnit.conn();
+		try {
+			Statement stm = conn.createStatement();
+			stm.executeUpdate("UPDATE shopCar SET num=" + add + " where name='" + originName + "' and username='"+formUsername+"' ");
+			stm.executeUpdate("DELETE FROM shopCar WHERE username = 'noLogin'");
+			System.out.println("success changeUserName");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
