@@ -38,7 +38,11 @@ public class doCar extends HttpServlet {
 		// 从url中获取操作内容和商品id
 		String action = request.getParameter("action");
 		String strId = request.getParameter("id");
-		String username=request.getParameter("username");
+		String username = request.getParameter("username");
+		String loginUserName = (String) request.getSession().getAttribute("loginUserName");
+		if (loginUserName==null) {
+			loginUserName = "noLogin";
+		}
 		// 将id从string转为int
 		int id = Integer.parseInt(strId);
 		// 获取session中保存的goodSingle对象，将其转为arraylist类型
@@ -78,7 +82,7 @@ public class doCar extends HttpServlet {
 
 					// 调用shopcarOptionServers中add方法，将商品的对应数据存入到shopCar表中
 					// 商品数量暂时写死为1，一次数量加1
-					if (shopCarOptionServers.add(strId, goodSingle.getName(), goodSingle.getPrice(), 1,username)) {
+					if (shopCarOptionServers.add(strId, goodSingle.getName(), goodSingle.getPrice(), 1, username)) {
 						// 返回显示内容，用以shopCarIndex显示
 						request.getSession().setAttribute("showWhat", "buy");
 
@@ -99,7 +103,7 @@ public class doCar extends HttpServlet {
 		}
 		if (action.equals("clear")) {
 			// 在购物车界面点击clear 清空购物车并跳转到商店页面
-			if (shopCarOptionServers.clear()) {
+			if (shopCarOptionServers.clear(loginUserName)) {
 				// 返回显示内容
 				request.getSession().setAttribute("showWhat", "buy");
 				// 重定向
@@ -143,7 +147,7 @@ public class doCar extends HttpServlet {
 		}
 		if (action.equals("docar")) {
 			try {
-				if (shopCarOptionServers.buy()) {
+				if (shopCarOptionServers.buy(loginUserName)) {
 					request.getSession().setAttribute("showWhat", "shopCar");
 					// 重定向
 					request.getSession().setAttribute("alert", "alert('购买成功');");

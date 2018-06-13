@@ -30,11 +30,12 @@ public class shopCarOptionServers {
 
 	/**
 	 * 清空购物车表
+	 * @param username 
 	 * 
 	 * @return
 	 */
-	public static boolean clear() {
-		return shopCarOptionDao.clear();
+	public static boolean clear(String username) {
+		return shopCarOptionDao.clear(username);
 	}
 
 	/**
@@ -61,16 +62,16 @@ public class shopCarOptionServers {
 
 	/**
 	 * 对比购物车表和库存表 减少库存中的数量
+	 * @param username 
 	 * 
 	 * @return
 	 * @throws NamingException
 	 * @throws SQLException
 	 */
 
-	public static boolean buy() throws SQLException, NamingException {
-		System.out.println("function is in servers");
+	public static boolean buy(String username) throws SQLException, NamingException {
 		// TODO Auto-generated method stub
-		return shopCarOptionDao.buy();
+		return shopCarOptionDao.buy(username);
 	}
 
 	/**
@@ -82,7 +83,6 @@ public class shopCarOptionServers {
 	 * @throws SQLException 
 	 */
 	public static boolean changeUser(String formUsername) throws SQLException, NamingException {
-		System.out.println("in servers");
 		return shopCarOptionDao.changeUser(formUsername);
 
 	}
