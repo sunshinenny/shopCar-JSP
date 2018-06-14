@@ -2,11 +2,12 @@
 <%@page import="com.domain.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.text.DecimalFormat"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 	
 <%
-	ArrayList<GoodsList> buyList =shopCarOptionServers.showCar();
+	ArrayList<GoodsList> buyList =shopCarOptionServers.showCar((String)session.getAttribute("loginUserName"));
 %>
 
 <html>
@@ -15,7 +16,7 @@
 <body>
 	<%!float total = 0;%>
 	<%
-		DecimalFormat df = new DecimalFormat("0.00");
+		DecimalFormat df = new DecimalFormat("0.0");
 		if (buyList == null || buyList.size() == 0) {
 			total = 0;
 	%>
@@ -53,9 +54,15 @@
 	<div class="m-sidebar">
 		<div class="cart">
 			<i id="end"></i> <span><a href="doCar?action=shopBox&id=-1">商城库存</a></span>
-			<i id="end"></i> <span>总价:<%=df.format(total)%></span> <i id="end"></i>
+			<i id="end"></i> <span>总价<br><%=df.format(total)%></span> <i id="end"></i>
 			<br>
-			<span><a href="doCar?action=docar&id=-1"><span style="color:red;">购买</span></a></span>
+			<c:if test="${loginUserName!=null}" var="cheackLoginResult" scope="session">
+					<span><a href="doCar?action=docar&id=-1"><span style="color:red;">购买</span></a></span>
+			</c:if>
+			<c:if test="${loginUserName==null or loginUserName=='noLogin'}" var="cheackLoginResult" scope="session">
+					<span><a href="login.jsp?act=loginThanBuy"><span style="color:red;">登陆后购买</span></a></span>
+					
+			</c:if>
 			<br>
 			<span><a href="doCar?action=clear&id=-1"><span style="color: #FFFFFF;">清除购物车</span></a></span>
 		</div>

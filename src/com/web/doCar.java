@@ -38,6 +38,11 @@ public class doCar extends HttpServlet {
 		// 从url中获取操作内容和商品id
 		String action = request.getParameter("action");
 		String strId = request.getParameter("id");
+		String username = request.getParameter("username");
+		String loginUserName = (String) request.getSession().getAttribute("loginUserName");
+		if (loginUserName==null) {
+			loginUserName = "noLogin";
+		}
 		// 将id从string转为int
 		int id = Integer.parseInt(strId);
 		// 获取session中保存的goodSingle对象，将其转为arraylist类型
@@ -51,7 +56,7 @@ public class doCar extends HttpServlet {
 			try {
 				// 判断购物车中商品数量，如果购物车中数量大于库存数，不允许对其进行添加
 				// new一个临时GoodsList型的buyList集合，获取购物车数据库中的信息
-				ArrayList<GoodsList> buyList = shopCarOptionServers.showCar();
+				ArrayList<GoodsList> buyList = shopCarOptionServers.showCar(username);
 				// 定义两个变量，获取name和num
 				String getBuyListNameString = null;
 				int getBuyListNumInt = 0;
@@ -69,6 +74,7 @@ public class doCar extends HttpServlet {
 						break;
 					}
 				}
+				// 上方代码可能有BUG，但是它设计的只是购物车中所有的商品数的判断，可能不会出错，警告⚠️
 				// 进行判断，如果购物车内的数量少于库存，则进行添加操作
 				if (goodSingle.getNum() > getBuyListNumInt) {
 					// System.out.println("添加成功\n" + "库存数为" +
@@ -76,7 +82,7 @@ public class doCar extends HttpServlet {
 
 					// 调用shopcarOptionServers中add方法，将商品的对应数据存入到shopCar表中
 					// 商品数量暂时写死为1，一次数量加1
-					if (shopCarOptionServers.add(strId, goodSingle.getName(), goodSingle.getPrice(), 1)) {
+					if (shopCarOptionServers.add(strId, goodSingle.getName(), goodSingle.getPrice(), 1, username)) {
 						// 返回显示内容，用以shopCarIndex显示
 						request.getSession().setAttribute("showWhat", "buy");
 
@@ -97,7 +103,7 @@ public class doCar extends HttpServlet {
 		}
 		if (action.equals("clear")) {
 			// 在购物车界面点击clear 清空购物车并跳转到商店页面
-			if (shopCarOptionServers.clear()) {
+			if (shopCarOptionServers.clear(loginUserName)) {
 				// 返回显示内容
 				request.getSession().setAttribute("showWhat", "buy");
 				// 重定向
@@ -141,7 +147,7 @@ public class doCar extends HttpServlet {
 		}
 		if (action.equals("docar")) {
 			try {
-				if (shopCarOptionServers.buy()) {
+				if (shopCarOptionServers.buy(loginUserName)) {
 					request.getSession().setAttribute("showWhat", "shopCar");
 					// 重定向
 					request.getSession().setAttribute("alert", "alert('购买成功');");

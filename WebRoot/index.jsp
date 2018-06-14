@@ -42,6 +42,9 @@
 		<script type="text/javascript">
 			${sessionScope.alert }
 		</script>
+		<%
+			session.removeAttribute("alert");
+		%>
 	</c:if>
 </body>
 </html>

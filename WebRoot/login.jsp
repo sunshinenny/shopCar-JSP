@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>登陆</title>
+<title>登录</title>
 </head>
 
 <body>
@@ -37,12 +37,24 @@
 				</div>
 			</c:if>
 			<div>
-				<td><input type="submit" value="登陆"
-					class="btn btn-embossed btn-primary" /></td>
+				<%
+					String act = String.valueOf(request.getParameter("act"));
+					if (act.equals("loginThanBuy")) {
+				%>
+				<td><input type="submit" value="登录即可完成购买"
+					class="btn btn-embossed btn-primary" id="loginButton" /></td>
+				<%
+					} else {
+				%><td><input type="submit" value="登录"
+					class="btn btn-embossed btn-primary" id="loginButton" /></td>
+				<%
+					}
+				%>
 				<td><input type="reset" value="取消" style="background: gray;"
 					class="btn btn-default btn-primary" /></td>
 			</div>
 		</form>
 	</div>
+
 </body>
 </html>
