@@ -37,7 +37,8 @@ public class shopCarOptionDao {
 		Connection conn = JDBCUnit.conn();
 		Statement stm = conn.createStatement();
 		// sql语句-在shopCar表中查找名字叫做name的商品「name代表商品名称」
-		ResultSet getSingle = stm.executeQuery("select * from shopCar where name='" + name + "'");
+		ResultSet getSingle = stm
+				.executeQuery("select * from shopCar where name='" + name + "' and username='" + username + "'");
 		// 计算该ResultSet对象的长度，用以判断该商品是否已经存在于数据库中
 		// 跳转到rs最后一项，并获取行号
 		// 或许还有一个办法，直接返回stm查询到的数量即可
@@ -57,7 +58,7 @@ public class shopCarOptionDao {
 				pStmt.setLong(4, num);
 				pStmt.setString(5, username);
 				pStmt.executeUpdate();
-				JDBCUnit.close(null, null, conn);
+				conn.close();
 				return true;
 			} else {
 				// 否则将其数量加1
@@ -77,10 +78,12 @@ public class shopCarOptionDao {
 								+ name + "' and username='" + username + "' ");
 						// 关闭数据库
 						conn.close();
+						// 由于一个商品只会出现一次，在成功修改完一次之后即可return true
 						return true;
 					}
 
 				}
+				// 下面的代码理论上可以删除，但目前应该不影响结果
 				// 遍历结束后如果没有return回去，说明没有该用户，则针对该用户增加指定商品
 				PreparedStatement pStmt = conn
 						.prepareStatement("insert into shopCar (id,name,price,num,username) value(?,?,?,?,?)");
@@ -98,14 +101,15 @@ public class shopCarOptionDao {
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			JDBCUnit.close(null, null, conn);
+			conn.close();
 			return false;
 		}
 	}
 
 	/**
 	 * 清空shopCar表
-	 * @param username 
+	 * 
+	 * @param username
 	 * 
 	 * @return
 	 */
@@ -115,8 +119,8 @@ public class shopCarOptionDao {
 		try {
 			conn = JDBCUnit.conn();
 			Statement stm = conn.createStatement();
-			// sql语句-清空shopCar表
-			stm.executeUpdate("DELETE FROM shopCar WHERE username = '"+username+"'");
+			// 删除当前用户购物车内但所有商品信息
+			stm.executeUpdate("DELETE FROM shopCar WHERE username = '" + username + "'");
 			// 关闭数据库
 			conn.close();
 			return true;
@@ -174,7 +178,8 @@ public class shopCarOptionDao {
 	}
 
 	/**
-	 * 将数据库中的内容存入GoodsList格式的集合中，用以shopCar.jsp进行显示
+	 * 将数据库中的内容存入GoodsList格式的集合中，用以shopCar.jsp进行显示 仅显示当前用户但购物车
+	 * 以后可以考虑增加administer模式，可以直接查看所有人但购物车
 	 * 
 	 * @param username
 	 * 
@@ -202,13 +207,14 @@ public class shopCarOptionDao {
 
 		}
 		// 关闭数据库
-		JDBCUnit.close(rs, stm, conn);
+		conn.close();
 		return list;
 	}
 
 	/**
 	 * 对比购物车表和库存表 减少库存中的数量
-	 * @param username 
+	 * 
+	 * @param username
 	 * 
 	 * @return
 	 * @throws SQLException
@@ -222,7 +228,7 @@ public class shopCarOptionDao {
 		ResultSet rsAll = stmAll.executeQuery("select * from goods");
 		// 获取购物车信息
 		Statement stmShopCar = conn.createStatement();
-		ResultSet rsShopCar = stmShopCar.executeQuery("select * from shopCar where username='"+username+"'");
+		ResultSet rsShopCar = stmShopCar.executeQuery("select * from shopCar where username='" + username + "'");
 		// 库存信息作为外循环开始遍历
 		try {
 			while (rsAll.next()) {
@@ -233,7 +239,7 @@ public class shopCarOptionDao {
 					int inNum = rsShopCar.getInt("num");
 					if (outName.equals(inName)) {
 						int cut = outNum - inNum;
-						if (changeKuCun(outName, cut,username)) {
+						if (changeKuCun(outName, cut, username)) {
 							continue;
 						} else {
 							System.out.println("购买操作失败，请重试");
@@ -258,7 +264,7 @@ public class shopCarOptionDao {
 	 * 
 	 * @param outName
 	 * @param i
-	 * @param username 
+	 * @param username
 	 * @throws SQLException
 	 * @throws NamingException
 	 */
@@ -322,7 +328,7 @@ public class shopCarOptionDao {
 						}
 						// 如果登陆用户没有该商品，添加到其购物车中
 						else {
-							if (changeUserName(originName, originNum, formUsername,"change")) {
+							if (changeUserName(originName, originNum, formUsername, "change")) {
 								continue;
 							} else {
 								System.out.println("购买操作失败，请重试");
@@ -370,11 +376,11 @@ public class shopCarOptionDao {
 			if (act.equals("add")) {
 				stm.executeUpdate("UPDATE shopCar SET num=" + num + " where name='" + originName + "' and username='"
 						+ formUsername + "' ");
-				stm.executeUpdate("DELETE FROM shopCar WHERE username = 'noLogin' and name ='"+originName+"'");
-			} else if(act.equals("change")) {
+				stm.executeUpdate("DELETE FROM shopCar WHERE username = 'noLogin' and name ='" + originName + "'");
+			} else if (act.equals("change")) {
 				// 如果操作为change，则修改nologin用户为登陆后账号
-				stm.executeUpdate(
-						"UPDATE shopCar SET username='" + formUsername + "' where name='" + originName + "' and username='noLogin' ");
+				stm.executeUpdate("UPDATE shopCar SET username='" + formUsername + "' where name='" + originName
+						+ "' and username='noLogin' ");
 			}
 
 			return true;
